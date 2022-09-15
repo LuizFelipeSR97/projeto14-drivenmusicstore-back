@@ -102,6 +102,7 @@ server.get("/sessions", async (req,res) =>{
         }
 
         const id = await db.collection("users").findOne({_id: session.userId})
+
         res.send(id)
 
     } catch(error) {
@@ -144,5 +145,24 @@ server.post("/sessions", async (req,res) => {
         res.status(500).send(error.message)
     }
 });  
+
+server.delete("/sessions", async (req,res) =>{
+
+    const token = req.headers.authorization?.replace('Bearer ', '');
+
+    if (!token) {
+        return res.sendStatus(400);
+      }
+
+    try{
+
+        await db.collection("sessions").deleteOne({token})
+
+        res.sendStatus(200)
+
+    } catch(error) {
+        res.status(500).send(error.message)
+    }
+});
 
 server.listen(process.env.MONGO_PORT);
