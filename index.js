@@ -36,7 +36,6 @@ const userSchema = joi.object({
     password: joi.string().required()
 })
 
-
 //
 
 // Route Users
@@ -44,7 +43,6 @@ const userSchema = joi.object({
 server.get("/users", async (req,res) =>{
 
     try{
-
         const users = await db.collection("users").find().toArray()
         res.send(users)
 
@@ -101,8 +99,11 @@ server.get("/sessions", async (req,res) =>{
             return res.sendStatus(401);
         }
 
-        const id = await db.collection("users").findOne({_id: session.userId})
-        res.send(id)
+        const userInfo = await db.collection("users").findOne({_id: session.userId})
+
+        const user = {id: userInfo._id, name: userInfo.name, email: userInfo.email}
+
+        res.send(user)
 
     } catch(error) {
         res.status(500).send(error.message)
@@ -138,11 +139,50 @@ server.post("/sessions", async (req,res) => {
             token
         })
 
-        res.send(token)
+        res.send({id: user._id, name: user.name, email:user.email, token})
 
     } catch (error) {
         res.status(500).send(error.message)
     }
 });  
+
+server.delete("/sessions", async (req,res) =>{
+
+    const token = req.headers.authorization?.replace('Bearer ', '');
+
+    if (!token) {
+        return res.sendStatus(400);
+      }
+
+    try{
+
+        await db.collection("sessions").deleteOne({token})
+
+        res.sendStatus(200)
+
+    } catch(error) {
+        res.status(500).send(error.message)
+    }
+});
+
+// Route Products
+
+server.get("/products", async (req,res) =>{
+
+    //Body: {type: instruments}
+
+    try{
+
+        const type = req.body.type;
+
+        const produtos = await db.collection("products").find({type: type}).toArray()
+
+        res.send(produtos)
+
+    } catch(error) {
+        res.status(500).send(error.message)
+    }
+
+});
 
 server.listen(process.env.MONGO_PORT);
