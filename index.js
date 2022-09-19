@@ -220,4 +220,4 @@ server.post("/products", async (req,res) => {
     }
 }); 
 
-server.listen(process.env.MONGO_PORT);
+server.listen(process.env.PORT, ()=>{console.log(`Server running on port ${process.env.PORT}`)});
