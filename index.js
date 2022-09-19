@@ -167,7 +167,7 @@ server.delete("/sessions", async (req,res) =>{
 
 // Route Products
 
-server.get("/products", async (req,res) =>{
+/* server.get("/products", async (req,res) =>{
 
     //Body: {type: instruments}
 
@@ -183,6 +183,41 @@ server.get("/products", async (req,res) =>{
         res.status(500).send(error.message)
     }
 
+}); */
+
+server.get("/products", async (req,res) =>{
+
+    try{
+
+        const produtos = await db.collection("products").find().toArray()
+        res.send(produtos)
+
+    } catch(error) {
+        res.status(500).send(error.message)
+    }
+
 });
 
-server.listen(process.env.MONGO_PORT);
+server.post("/products", async (req,res) => {
+
+    const product = req.body;
+
+    try {
+    
+        const sameProduct = await db.collection('products').findOne({ name: product.name });
+
+        if (sameProduct) {
+            res.send("Esse produto já existe.")
+            return
+        }
+
+        await db.collection("products").insertOne(product)
+
+        res.send(product)
+
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}); 
+
+server.listen(process.env.PORT, ()=>{console.log(`Server running on port ${process.env.PORT}`)});
