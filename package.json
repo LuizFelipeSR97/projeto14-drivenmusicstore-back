@@ -5,8 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./src/site.js",
-		"dev": "npx nodemon ./src/site.js",
+    "start": "node ./index.js",
+		"dev": "npx nodemon ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
